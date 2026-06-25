@@ -92,7 +92,7 @@
    Shared tokens (theme-agnostic)
    =========================== */
 :root {
-  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
   --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
 
   --sp-1: .25rem;  --sp-2: .5rem;   --sp-3: .75rem;
@@ -474,8 +474,8 @@ body {
 
 .quote-text {
   font-family: var(--font-serif);
-  font-size: clamp(1.15rem, 2.8vw, 1.5rem);
-  line-height: 1.82;
+  font-size: clamp(1.25rem, 2.8vw, 1.65rem);
+  line-height: 1.75;
   color: var(--clr-text);
   font-style: italic;
   quotes: none;

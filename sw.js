@@ -1,4 +1,4 @@
-const CACHE  = 'stoic-v1';
+const CACHE  = 'stoic-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const ASSETS = [
   './assets/js/quotes.js',
   './assets/js/selector.js',
   './assets/icons/icon.svg',
-  'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap',
+  'https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&display=swap',
 ];
 
 // ── Install: precache all static assets ──────────────────────────────────
