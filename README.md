@@ -7,13 +7,12 @@
   <img src="https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript ES6+" />
   <img src="https://img.shields.io/badge/sem%20framework-zero%20deps-8b7355?style=flat-square" alt="Zero dependências" />
   <img src="https://img.shields.io/badge/frases-365-1a1a2e?style=flat-square" alt="365 frases" />
-  <img src="https://img.shields.io/badge/PWA-instalável-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA" />
   <img src="https://img.shields.io/github/license/danhpaiva/DailyStoicView-html-css-js?style=flat-square" alt="Licença MIT" />
 </p>
 
 <p align="center">
   Uma Single Page Application minimalista que exibe uma frase estoica diferente para cada dia do ano —<br/>
-  sem banco de dados, sem API, sem dependências. Funciona offline e pode ser instalada como app.
+  sem banco de dados, sem API, sem dependências.
 </p>
 
 <p align="center">
@@ -51,14 +50,11 @@ As 365 frases estão em **português brasileiro** e são extraídas de obras pri
 - **Compartilhar** — usa a Web Share API com fallback para clipboard
 - **Streak de leitura** — contador de dias consecutivos com marcos em 7, 14, 21, 30, 60, 90, 180 e 365 dias
 - **Tema claro / escuro** — detecção automática via `prefers-color-scheme` + alternância manual
-- **PWA instalável** — manifest + service worker com suporte offline total
 
 ## Estrutura
 
 ```
 index.html                  → estrutura semântica (HTML5)
-manifest.json               → manifesto PWA (ícone, display standalone, start_url)
-sw.js                       → service worker (cache-first para assets, network-first para fontes)
 assets/
   css/
     style.css               → design tokens com variáveis CSS, tema claro/escuro, mobile-first
@@ -67,7 +63,7 @@ assets/
     selector.js             → funções puras: dayOfYear(date), getQuote(date, quotes)
     app.js                  → DOM, eventos, localStorage (favoritos, streak, tema)
   icons/
-    icon.svg                → ícone do app (SVG, suporta maskable)
+    icon.svg                → ícone da aba do navegador (SVG)
 .github/
   workflows/
     deploy.yml              → deploy automático no GitHub Pages via push para main
@@ -86,15 +82,6 @@ Inspirado em pergaminhos estoicos — tons de areia, âmbar e terracota. Tipogra
 
 Tipografia: **Crimson Pro** (serif) para a frase · **Inter** (sans-serif) para metadados e navegação.
 
-## PWA e offline
-
-O service worker (`sw.js`) utiliza duas estratégias de cache:
-
-- **Cache-first** para o app shell (HTML, CSS, JS, ícones) — carrega instantaneamente mesmo offline
-- **Network-first** para fontes Google — atualiza quando há conexão, cai no cache caso contrário
-
-Na instalação, todos os assets estáticos são pré-cacheados. Ao ativar uma nova versão, caches antigos são removidos automaticamente.
-
 ## Como executar localmente
 
 O projeto não tem build step. Qualquer servidor HTTP estático funciona.
@@ -107,7 +94,7 @@ npx serve .
 python -m http.server 8000
 ```
 
-> Não abra `index.html` diretamente pelo sistema de arquivos — os módulos ES6 e o service worker exigem um servidor HTTP.
+> Não abra `index.html` diretamente pelo sistema de arquivos — os módulos ES6 exigem um servidor HTTP.
 
 ## Deploy
 
