@@ -234,16 +234,123 @@ body {
 }
 
 /* ===========================
-   Date Label
+   Date Navigation
    =========================== */
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.date-arrow {
+  background: transparent;
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+  flex-shrink: 0;
+  transition: background var(--t-fast), border-color var(--t-fast),
+              color var(--t-fast), transform var(--t-fast);
+}
+
+.date-arrow:hover {
+  background: var(--clr-surface-2);
+  border-color: var(--clr-accent);
+  color: var(--clr-accent);
+  transform: scale(1.1);
+}
+
+.date-arrow:active { transform: scale(.95); }
+
+.date-label-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .date-label {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
   font-size: .7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .2em;
   color: var(--clr-text-muted);
-  text-align: center;
-  margin-bottom: var(--sp-5);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  transition: color var(--t-fast), background var(--t-fast);
+  white-space: nowrap;
+}
+
+.date-label:hover {
+  color: var(--clr-accent);
+  background: var(--clr-accent-dim);
+}
+
+.date-label::after {
+  content: '↓';
+  font-size: .6rem;
+  margin-left: .4em;
+  opacity: .5;
+  vertical-align: middle;
+}
+
+/* Hidden native date picker — positioned under the label */
+#date-picker {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+/* Back to today */
+.back-to-today-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--sp-4);
+  min-height: 1.8rem;
+}
+
+.back-to-today {
+  background: var(--clr-accent-dim);
+  border: 1px solid transparent;
+  color: var(--clr-accent);
+  font-family: var(--font-sans);
+  font-size: .76rem;
+  font-weight: 500;
+  padding: .3rem .9rem;
+  border-radius: var(--r-xl);
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast),
+              opacity var(--t-fast), transform var(--t-fast);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+
+.back-to-today.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-today:hover {
+  background: var(--clr-accent-dim);
+  border-color: var(--clr-accent);
 }
 
 /* ===========================

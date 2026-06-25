@@ -27,29 +27,38 @@ initTheme();
 // ── State ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'stoic_favorites';
 
-let currentDate   = new Date();
-let isPreviewing  = false;
+const today = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+let currentDate = today();
 
 // ── DOM Refs ────────────────────────────────────────────────────────────
-const elDateLabel   = document.getElementById('date-label');
-const elQuoteText   = document.getElementById('quote-text');
-const elQuoteAuthor = document.getElementById('quote-author');
-const elQuoteWork   = document.getElementById('quote-work');
-const elQuoteCard   = document.getElementById('quote-card');
+const elDateLabel    = document.getElementById('date-label');
+const elDatePicker   = document.getElementById('date-picker');
+const btnPrevDay     = document.getElementById('btn-prev-day');
+const btnNextDay     = document.getElementById('btn-next-day');
+const btnBackToday   = document.getElementById('btn-back-today');
 
-const btnFavorite  = document.getElementById('btn-favorite');
-const btnShare     = document.getElementById('btn-share');
-const btnTomorrow  = document.getElementById('btn-tomorrow');
-const elFeedback   = document.getElementById('share-feedback');
+const elQuoteText    = document.getElementById('quote-text');
+const elQuoteAuthor  = document.getElementById('quote-author');
+const elQuoteWork    = document.getElementById('quote-work');
+const elQuoteCard    = document.getElementById('quote-card');
 
-const btnToday     = document.getElementById('btn-today');
-const btnFavorites = document.getElementById('btn-favorites');
-const elFavCount   = document.getElementById('fav-count');
+const btnFavorite    = document.getElementById('btn-favorite');
+const btnShare       = document.getElementById('btn-share');
+const elFeedback     = document.getElementById('share-feedback');
 
-const secToday     = document.getElementById('section-today');
-const secFavorites = document.getElementById('section-favorites');
-const elFavList    = document.getElementById('favorites-list');
-const elEmptyFavs  = document.getElementById('empty-favorites');
+const btnToday       = document.getElementById('btn-today');
+const btnFavorites   = document.getElementById('btn-favorites');
+const elFavCount     = document.getElementById('fav-count');
+
+const secToday       = document.getElementById('section-today');
+const secFavorites   = document.getElementById('section-favorites');
+const elFavList      = document.getElementById('favorites-list');
+const elEmptyFavs    = document.getElementById('empty-favorites');
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 function getFavorites() {
@@ -62,12 +71,27 @@ function saveFavorites(favs) {
 }
 
 function formatDate(date) {
-  return date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return date.toLocaleDateString('pt-BR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  });
 }
 
-function quoteId(quote) {
-  return quote.text.slice(0, 40);
+// "2026-06-24" — format required by <input type="date">
+function toInputValue(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
+
+function isToday(date) {
+  const t = today();
+  return date.getFullYear() === t.getFullYear() &&
+         date.getMonth()    === t.getMonth()    &&
+         date.getDate()     === t.getDate();
+}
+
+function quoteId(quote) { return quote.text.slice(0, 40); }
 
 function isFavorited(quote) {
   return getFavorites().some(f => f.id === quoteId(quote));
@@ -89,42 +113,59 @@ function updateFavCount() {
 // ── Render Quote ─────────────────────────────────────────────────────────
 function renderQuote(date) {
   const quote = getQuote(date, quotes);
-  const label = isPreviewing
-    ? `Amanhã · ${formatDate(date)}`
-    : formatDate(date);
 
-  elDateLabel.textContent = label;
+  elDateLabel.textContent = formatDate(date);
+  elDatePicker.value      = toInputValue(date);
   elQuoteText.textContent = `"${quote.text}"`;
   elQuoteAuthor.textContent = quote.author;
-  elQuoteWork.textContent = quote.work;
+  elQuoteWork.textContent   = quote.work;
 
-  // Restart animation
+  // Restart card animation
   elQuoteCard.style.animation = 'none';
-  elQuoteCard.offsetHeight;        // reflow
+  elQuoteCard.offsetHeight;
   elQuoteCard.style.animation = '';
+
+  // Show/hide "back to today"
+  btnBackToday.classList.toggle('visible', !isToday(date));
 
   updateFavoriteButton(quote);
 }
 
-// ── Render Favorites ─────────────────────────────────────────────────────
-function renderFavorites() {
-  const favs = getFavorites();
-  elEmptyFavs.classList.toggle('hidden', favs.length > 0);
-  elFavList.innerHTML = '';
-
-  favs.forEach((fav, idx) => {
-    const li = document.createElement('li');
-    li.className = 'favorite-item';
-    li.style.animationDelay = `${idx * 40}ms`;
-    li.innerHTML = `
-      <blockquote>"${fav.text}"</blockquote>
-      <p class="fav-meta">${fav.author} · <em>${fav.work}</em></p>
-      <div class="fav-actions">
-        <button class="fav-remove-btn" data-id="${fav.id}" aria-label="Remover ${fav.author} dos favoritos">Remover</button>
-      </div>`;
-    elFavList.appendChild(li);
-  });
+// ── Navigate to date ──────────────────────────────────────────────────────
+function navigateTo(date) {
+  currentDate = new Date(date);
+  currentDate.setHours(0, 0, 0, 0);
+  renderQuote(currentDate);
 }
+
+function shiftDay(delta) {
+  const d = new Date(currentDate);
+  d.setDate(d.getDate() + delta);
+  navigateTo(d);
+}
+
+// ── Event: Prev / Next day ────────────────────────────────────────────────
+btnPrevDay.addEventListener('click', () => shiftDay(-1));
+btnNextDay.addEventListener('click', () => shiftDay(+1));
+
+// ── Event: Click date label → open date picker ────────────────────────────
+elDateLabel.addEventListener('click', () => elDatePicker.showPicker?.() ?? elDatePicker.click());
+
+elDatePicker.addEventListener('change', () => {
+  if (!elDatePicker.value) return;
+  const [y, m, d] = elDatePicker.value.split('-').map(Number);
+  navigateTo(new Date(y, m - 1, d));
+});
+
+// ── Event: Back to today ──────────────────────────────────────────────────
+btnBackToday.addEventListener('click', () => navigateTo(today()));
+
+// ── Keyboard: arrow keys on date nav area ────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowLeft')  shiftDay(-1);
+  if (e.key === 'ArrowRight') shiftDay(+1);
+});
 
 // ── Event: Favorite ───────────────────────────────────────────────────────
 btnFavorite.addEventListener('click', () => {
@@ -147,8 +188,7 @@ btnFavorite.addEventListener('click', () => {
 elFavList.addEventListener('click', e => {
   const btn = e.target.closest('.fav-remove-btn');
   if (!btn) return;
-  const id   = btn.dataset.id;
-  const favs = getFavorites().filter(f => f.id !== id);
+  const favs = getFavorites().filter(f => f.id !== btn.dataset.id);
   saveFavorites(favs);
   renderFavorites();
   updateFavCount();
@@ -185,23 +225,26 @@ function showFeedback(msg) {
   feedbackTimer = setTimeout(() => { elFeedback.textContent = ''; }, 2800);
 }
 
-// ── Event: Tomorrow preview ───────────────────────────────────────────────
-btnTomorrow.addEventListener('click', () => {
-  if (isPreviewing) {
-    isPreviewing   = false;
-    currentDate    = new Date();
-    btnTomorrow.querySelector('.btn-label').textContent = 'Amanhã';
-    btnTomorrow.querySelector('.icon').textContent = '→';
-  } else {
-    isPreviewing = true;
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    currentDate = tomorrow;
-    btnTomorrow.querySelector('.btn-label').textContent = 'Voltar';
-    btnTomorrow.querySelector('.icon').textContent = '←';
-  }
-  renderQuote(currentDate);
-});
+// ── Render Favorites ─────────────────────────────────────────────────────
+function renderFavorites() {
+  const favs = getFavorites();
+  elEmptyFavs.classList.toggle('hidden', favs.length > 0);
+  elFavList.innerHTML = '';
+
+  favs.forEach((fav, idx) => {
+    const li = document.createElement('li');
+    li.className = 'favorite-item';
+    li.style.animationDelay = `${idx * 40}ms`;
+    li.innerHTML = `
+      <blockquote>"${fav.text}"</blockquote>
+      <p class="fav-meta">${fav.author} · <em>${fav.work}</em></p>
+      <div class="fav-actions">
+        <button class="fav-remove-btn" data-id="${fav.id}"
+          aria-label="Remover dos favoritos">Remover</button>
+      </div>`;
+    elFavList.appendChild(li);
+  });
+}
 
 // ── Event: Nav tabs ───────────────────────────────────────────────────────
 btnToday.addEventListener('click', () => {

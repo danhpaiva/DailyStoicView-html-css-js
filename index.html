@@ -30,7 +30,20 @@
 
     <!-- Seção: Frase do Dia -->
     <section class="section-today" id="section-today" aria-label="Frase do dia">
-      <p class="date-label" id="date-label" aria-live="polite"></p>
+      <div class="date-nav" aria-label="Navegação por data">
+        <button class="date-arrow" id="btn-prev-day" aria-label="Dia anterior" title="Dia anterior">&#8592;</button>
+
+        <div class="date-label-wrap">
+          <button class="date-label" id="date-label" aria-label="Selecionar data" title="Clique para escolher uma data"></button>
+          <input type="date" id="date-picker" aria-label="Escolher data" tabindex="-1" />
+        </div>
+
+        <button class="date-arrow" id="btn-next-day" aria-label="Próximo dia" title="Próximo dia">&#8594;</button>
+      </div>
+
+      <div class="back-to-today-wrap" id="back-to-today-wrap" aria-live="polite">
+        <button class="back-to-today" id="btn-back-today">↩ Voltar para hoje</button>
+      </div>
 
       <article class="quote-card" id="quote-card" aria-live="polite">
         <blockquote class="quote-text" id="quote-text"></blockquote>
@@ -49,10 +62,6 @@
         <button class="action-btn" id="btn-share" aria-label="Compartilhar frase" title="Compartilhar">
           <span class="icon" aria-hidden="true">↗</span>
           <span class="btn-label">Compartilhar</span>
-        </button>
-        <button class="action-btn" id="btn-tomorrow" aria-label="Ver frase de amanhã" title="Amanhã">
-          <span class="icon" aria-hidden="true">→</span>
-          <span class="btn-label">Amanhã</span>
         </button>
       </div>
 
