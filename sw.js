@@ -1,4 +1,4 @@
-const CACHE  = 'stoic-v2';
+const CACHE  = 'stoic-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,8 @@ const ASSETS = [
   './assets/js/quotes.js',
   './assets/js/selector.js',
   './assets/icons/icon.svg',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
   'https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&display=swap',
 ];
 

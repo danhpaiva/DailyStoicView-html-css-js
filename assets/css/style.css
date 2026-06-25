@@ -242,20 +242,22 @@ body {
   justify-content: center;
   gap: var(--sp-3);
   margin-bottom: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .date-arrow {
   background: transparent;
   border: 1px solid var(--clr-border);
   color: var(--clr-text-muted);
-  width: 32px;
-  height: 32px;
+  /* 44×44 px — mínimo recomendado para alvos de toque (WCAG / Apple HIG) */
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: .9rem;
+  font-size: 1rem;
   flex-shrink: 0;
   transition: background var(--t-fast), border-color var(--t-fast),
               color var(--t-fast), transform var(--t-fast);
