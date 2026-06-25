@@ -1,6 +1,29 @@
 import { quotes } from './quotes.js';
 import { getQuote } from './selector.js';
 
+// ── Theme ─────────────────────────────────────────────────────────────
+const THEME_KEY = 'stoic_theme';
+
+function getSystemTheme() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('btn-theme');
+  if (btn) btn.querySelector('.theme-icon').textContent = theme === 'dark' ? '☽' : '☀︎';
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  applyTheme(saved ?? getSystemTheme());
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem(THEME_KEY)) applyTheme(e.matches ? 'dark' : 'light');
+  });
+}
+
+initTheme();
+
 // ── State ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'stoic_favorites';
 
@@ -198,6 +221,14 @@ btnFavorites.addEventListener('click', () => {
   btnFavorites.setAttribute('aria-pressed', 'true');
   btnToday.setAttribute('aria-pressed', 'false');
   renderFavorites();
+});
+
+// ── Event: Theme toggle ───────────────────────────────────────────────────
+document.getElementById('btn-theme').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || getSystemTheme();
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
 });
 
 // ── Init ─────────────────────────────────────────────────────────────────
