@@ -24,6 +24,60 @@ function initTheme() {
 
 initTheme();
 
+// ── Streak ────────────────────────────────────────────────────────────
+const STREAK_KEY = 'stoic_streak';
+
+function toDateStr(date) {
+  return date.toISOString().slice(0, 10); // "YYYY-MM-DD"
+}
+
+function loadStreak() {
+  try { return JSON.parse(localStorage.getItem(STREAK_KEY)) || {}; }
+  catch { return {}; }
+}
+
+function updateStreak() {
+  const todayStr     = toDateStr(new Date());
+  const data         = loadStreak();
+
+  if (data.lastVisit === todayStr) return data.streak ?? 1;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = toDateStr(yesterday);
+
+  const streak = data.lastVisit === yesterdayStr ? (data.streak ?? 0) + 1 : 1;
+  localStorage.setItem(STREAK_KEY, JSON.stringify({ lastVisit: todayStr, streak }));
+  return streak;
+}
+
+function renderStreak(streak) {
+  const wrap = document.getElementById('streak-wrap');
+  if (!wrap) return;
+
+  const milestones  = [7, 14, 21, 30, 60, 90, 180, 365];
+  const isMilestone = milestones.includes(streak);
+
+  const flame = streak >= 7 ? '🔥' : '✦';
+  const label = streak === 1
+    ? '1 dia seguido'
+    : `${streak} dias seguidos`;
+
+  const pill = document.createElement('div');
+  pill.className = `streak-pill${isMilestone ? ' milestone' : ''}`;
+  pill.setAttribute('title', streakTooltip(streak, isMilestone));
+  pill.innerHTML = `<span class="streak-flame" aria-hidden="true">${flame}</span>${label}`;
+
+  wrap.innerHTML = '';
+  wrap.appendChild(pill);
+}
+
+function streakTooltip(streak, isMilestone) {
+  if (isMilestone) return `🏆 Marco alcançado! ${streak} dias seguidos.`;
+  const next = [7, 14, 21, 30, 60, 90, 180, 365].find(m => m > streak) ?? 365;
+  return `Faltam ${next - streak} dia${next - streak !== 1 ? 's' : ''} para o próximo marco (${next} dias).`;
+}
+
 // ── State ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'stoic_favorites';
 
@@ -305,3 +359,4 @@ document.getElementById('btn-theme').addEventListener('click', () => {
 // ── Init ─────────────────────────────────────────────────────────────────
 renderQuote(currentDate);
 updateFavCount();
+renderStreak(updateStreak());

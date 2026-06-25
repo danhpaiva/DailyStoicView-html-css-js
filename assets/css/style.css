@@ -317,6 +317,53 @@ body {
   height: 1px;
 }
 
+/* Streak */
+.streak-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--sp-2);
+  min-height: 1.8rem;
+}
+
+.streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  background: var(--clr-accent-dim);
+  border: 1px solid transparent;
+  border-radius: var(--r-xl);
+  padding: .28rem .85rem;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--clr-accent);
+  letter-spacing: .02em;
+  opacity: 0;
+  transform: translateY(-4px);
+  animation: fadeUp .4s .1s cubic-bezier(.22,1,.36,1) forwards;
+  cursor: default;
+  user-select: none;
+  transition: background var(--t-slow), color var(--t-slow);
+  position: relative;
+}
+
+/* Highlight for milestone days */
+.streak-pill.milestone {
+  background: linear-gradient(135deg, rgba(202,138,4,.18), rgba(245,158,11,.1));
+  border-color: rgba(202,138,4,.35);
+  color: var(--clr-gold);
+}
+
+.streak-pill.milestone::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 12px rgba(202,138,4,.2);
+  pointer-events: none;
+}
+
+.streak-flame { font-size: .85rem; line-height: 1; }
+
 /* Back to today */
 .back-to-today-wrap {
   display: flex;
