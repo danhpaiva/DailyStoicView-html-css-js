@@ -7,12 +7,13 @@
   <img src="https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript ES6+" />
   <img src="https://img.shields.io/badge/sem%20framework-zero%20deps-8b7355?style=flat-square" alt="Zero dependências" />
   <img src="https://img.shields.io/badge/frases-365-1a1a2e?style=flat-square" alt="365 frases" />
+  <img src="https://img.shields.io/badge/PWA-instalável-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA" />
   <img src="https://img.shields.io/github/license/danhpaiva/DailyStoicView-html-css-js?style=flat-square" alt="Licença MIT" />
 </p>
 
 <p align="center">
   Uma Single Page Application minimalista que exibe uma frase estoica diferente para cada dia do ano —<br/>
-  sem banco de dados, sem API, sem dependências.
+  sem banco de dados, sem API, sem dependências. Funciona offline e pode ser instalada como app.
 </p>
 
 <p align="center">
@@ -23,36 +24,50 @@
 
 ## Sobre o projeto
 
-A seleção da frase é determinística: `dayOfYear % 365`. O mesmo dia do ano sempre exibe a mesma frase, em qualquer dispositivo, sem necessidade de backend.
+A seleção da frase é determinística: `(dayOfYear(date) - 1) % 365`. O mesmo dia do ano sempre exibe a mesma frase, em qualquer dispositivo, sem necessidade de backend.
 
-As 365 frases são extraídas de obras primárias estoicas:
+As 365 frases estão em **português brasileiro** e são extraídas de obras primárias estoicas:
 
 | Autor | Obra |
 |---|---|
 | Marco Aurélio | *Meditações* |
 | Epicteto | *Encheirídion* |
+| Epicteto | *Diatribes* |
 | Sêneca | *Cartas a Lucílio* |
-| Epicteto de Hierápolis | *Diatribes* |
+| Sêneca | *Sobre a Brevidade da Vida* |
+| Sêneca | *Sobre a Vida Feliz* |
+| Sêneca | *Hippolytus* |
 
 ## Funcionalidades
 
-- **Frase do dia** — seleção automática baseada no dia do ano
-- **Preview de amanhã** — botão que mostra a frase do dia seguinte sem alterar a data real
+- **Frase do dia** — seleção determinística baseada no dia do ano
+- **Navegação por data** — setas prev/next e seletor de calendário para explorar qualquer dia
+- **Voltar para hoje** — botão contextual que aparece ao navegar para outra data
+- **Frase aleatória** — botão "Surpreenda-me" que sorteia uma das 365 frases
+- **Animação de virada de página** — transição 3D direcional ao trocar a frase
+- **Modo foco** — expande o card para tela cheia, oculta header e footer
 - **Favoritos** — salva frases no `localStorage` com aba dedicada
+- **Exportar / Importar favoritos** — download e upload como `.json`
 - **Compartilhar** — usa a Web Share API com fallback para clipboard
-- **Fade-in animado** no card ao carregar ou trocar de frase
+- **Streak de leitura** — contador de dias consecutivos com marcos em 7, 14, 21, 30, 60, 90, 180 e 365 dias
+- **Tema claro / escuro** — detecção automática via `prefers-color-scheme` + alternância manual
+- **PWA instalável** — manifest + service worker com suporte offline total
 
 ## Estrutura
 
 ```
 index.html                  → estrutura semântica (HTML5)
+manifest.json               → manifesto PWA (ícone, display standalone, start_url)
+sw.js                       → service worker (cache-first para assets, network-first para fontes)
 assets/
   css/
-    style.css               → design tokens com variáveis CSS, mobile-first
+    style.css               → design tokens com variáveis CSS, tema claro/escuro, mobile-first
   js/
-    quotes.js               → array com 365 frases (dados puros, sem lógica)
+    quotes.js               → array com 365 frases em português brasileiro (dados puros)
     selector.js             → funções puras: dayOfYear(date), getQuote(date, quotes)
-    app.js                  → manipulação de DOM, eventos, localStorage
+    app.js                  → DOM, eventos, localStorage (favoritos, streak, tema)
+  icons/
+    icon.svg                → ícone do app (SVG, suporta maskable)
 .github/
   workflows/
     deploy.yml              → deploy automático no GitHub Pages via push para main
@@ -60,16 +75,25 @@ assets/
 
 ## Design
 
-Inspirado em pergaminhos estoicos — tons de areia, mármore e chumbo romano.
+Inspirado em pergaminhos estoicos — tons de areia, âmbar e terracota. Tipografia serifada para leitura contemplativa.
 
-| Token | Valor | Uso |
-|---|---|---|
-| `--color-lead` | `#1a1a2e` | Header, texto principal |
-| `--color-bg` | `#f5f0e8` | Fundo da página |
-| `--color-surface` | `#ede5d0` | Card da frase |
-| `--color-accent` | `#8b7355` | Botões, destaques |
+| Token | Claro | Escuro | Uso |
+|---|---|---|---|
+| `--clr-bg` | `#f9f5ed` | `#0f0e0d` | Fundo da página |
+| `--clr-surface` | `#fdfaf3` | `#1c1917` | Card da frase |
+| `--clr-accent` | `#b45309` | `#f59e0b` | Botões, destaques |
+| `--clr-text` | `#1c1917` | `#e7e5e4` | Texto principal |
 
-Tipografia: **Playfair Display** (serif) para a frase · **Inter** (sans-serif) para metadados.
+Tipografia: **Crimson Pro** (serif) para a frase · **Inter** (sans-serif) para metadados e navegação.
+
+## PWA e offline
+
+O service worker (`sw.js`) utiliza duas estratégias de cache:
+
+- **Cache-first** para o app shell (HTML, CSS, JS, ícones) — carrega instantaneamente mesmo offline
+- **Network-first** para fontes Google — atualiza quando há conexão, cai no cache caso contrário
+
+Na instalação, todos os assets estáticos são pré-cacheados. Ao ativar uma nova versão, caches antigos são removidos automaticamente.
 
 ## Como executar localmente
 
@@ -83,7 +107,7 @@ npx serve .
 python -m http.server 8000
 ```
 
-> Não abra `index.html` diretamente pelo sistema de arquivos — os módulos ES6 exigem um servidor HTTP.
+> Não abra `index.html` diretamente pelo sistema de arquivos — os módulos ES6 e o service worker exigem um servidor HTTP.
 
 ## Deploy
 
@@ -96,7 +120,7 @@ O deploy é automático via GitHub Actions. O workflow `.github/workflows/deploy
 
 ## Testando a lógica de seleção
 
-As funções em `selector.js` são puras e não têm dependências externas, facilitando testes unitários:
+As funções em `selector.js` são puras e não têm dependências externas:
 
 ```js
 import { dayOfYear, getQuote } from './assets/js/selector.js';

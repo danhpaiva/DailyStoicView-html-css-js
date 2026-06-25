@@ -4,10 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Uma frase estoica diferente para cada dia do ano." />
+  <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0a0908" media="(prefers-color-scheme: dark)" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Stoic" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg" />
   <title>Daily Stoic View</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
@@ -19,6 +28,9 @@
         <button class="nav-btn" id="btn-favorites" aria-pressed="false">
           Favoritos <span class="favorites-count" id="fav-count" aria-live="polite"></span>
         </button>
+        <button class="nav-btn theme-toggle" id="btn-theme" aria-label="Alternar tema" title="Alternar tema claro/escuro">
+          <span class="theme-icon" aria-hidden="true">☀︎</span>
+        </button>
       </nav>
     </div>
   </header>
@@ -27,15 +39,33 @@
 
     <!-- Seção: Frase do Dia -->
     <section class="section-today" id="section-today" aria-label="Frase do dia">
-      <p class="date-label" id="date-label" aria-live="polite"></p>
+      <div class="date-nav" aria-label="Navegação por data">
+        <button class="date-arrow" id="btn-prev-day" aria-label="Dia anterior" title="Dia anterior">&#8592;</button>
 
+        <div class="date-label-wrap">
+          <button class="date-label" id="date-label" aria-label="Selecionar data" title="Clique para escolher uma data"></button>
+          <input type="date" id="date-picker" aria-label="Escolher data" tabindex="-1" />
+        </div>
+
+        <button class="date-arrow" id="btn-next-day" aria-label="Próximo dia" title="Próximo dia">&#8594;</button>
+      </div>
+
+      <div class="streak-wrap" id="streak-wrap" aria-live="polite" aria-label="Streak de leitura"></div>
+
+      <div class="back-to-today-wrap" id="back-to-today-wrap" aria-live="polite">
+        <button class="back-to-today" id="btn-back-today">↩ Voltar para hoje</button>
+      </div>
+
+      <div class="quote-card-viewport">
       <article class="quote-card" id="quote-card" aria-live="polite">
         <blockquote class="quote-text" id="quote-text"></blockquote>
+        <div class="divider" aria-hidden="true"><span class="divider-diamond"></span></div>
         <footer class="quote-meta">
           <span class="quote-author" id="quote-author"></span>
           <span class="quote-work" id="quote-work"></span>
         </footer>
       </article>
+      </div><!-- /.quote-card-viewport -->
 
       <div class="card-actions">
         <button class="action-btn" id="btn-favorite" aria-label="Adicionar aos favoritos" title="Favoritar">
@@ -46,9 +76,13 @@
           <span class="icon" aria-hidden="true">↗</span>
           <span class="btn-label">Compartilhar</span>
         </button>
-        <button class="action-btn" id="btn-tomorrow" aria-label="Ver frase de amanhã" title="Amanhã">
-          <span class="icon" aria-hidden="true">→</span>
-          <span class="btn-label">Amanhã</span>
+        <button class="action-btn" id="btn-focus" aria-label="Modo foco" title="Modo leitura">
+          <span class="icon" aria-hidden="true">⛶</span>
+          <span class="btn-label">Foco</span>
+        </button>
+        <button class="action-btn" id="btn-random" aria-label="Frase aleatória" title="Surpreenda-me">
+          <span class="icon" aria-hidden="true">⚄</span>
+          <span class="btn-label">Surpreenda-me</span>
         </button>
       </div>
 
@@ -57,7 +91,19 @@
 
     <!-- Seção: Favoritos -->
     <section class="section-favorites hidden" id="section-favorites" aria-label="Frases favoritas">
-      <h2 class="section-title">Seus Favoritos</h2>
+      <div class="fav-header">
+        <h2 class="section-title">Seus Favoritos</h2>
+        <div class="fav-io-btns">
+          <button class="io-btn" id="btn-export" title="Exportar favoritos como JSON">
+            ↓ Exportar
+          </button>
+          <label class="io-btn" id="label-import" title="Importar favoritos de um arquivo JSON">
+            ↑ Importar
+            <input type="file" id="input-import" accept=".json" aria-label="Importar favoritos" />
+          </label>
+        </div>
+      </div>
+      <p class="import-feedback hidden" id="import-feedback" role="status" aria-live="assertive"></p>
       <p class="empty-state hidden" id="empty-favorites">Você ainda não favoritou nenhuma frase.</p>
       <ul class="favorites-list" id="favorites-list" aria-label="Lista de favoritos"></ul>
     </section>
@@ -67,6 +113,10 @@
   <footer class="site-footer">
     <p>Filosofia estoica para cada dia · <a href="https://github.com/danhpaiva/DailyStoicView-html-css-js" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
+
+  <button class="focus-exit" id="btn-focus-exit" aria-label="Sair do modo foco">
+    <span aria-hidden="true">✕</span> Sair do foco
+  </button>
 
   <script type="module" src="assets/js/app.js"></script>
 </body>

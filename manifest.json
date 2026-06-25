@@ -1,0 +1,36 @@
+{
+  "name": "Daily Stoic View",
+  "short_name": "Stoic",
+  "description": "Uma frase estoica diferente para cada dia do ano.",
+  "start_url": "/DailyStoicView-html-css-js/",
+  "scope": "/DailyStoicView-html-css-js/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "lang": "pt-BR",
+  "categories": ["lifestyle", "education"],
+  "icons": [
+    {
+      "src": "assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Frase de hoje",
+      "short_name": "Hoje",
+      "description": "Ver a frase estoica de hoje",
+      "url": "/DailyStoicView-html-css-js/"
+    }
+  ]
+}
