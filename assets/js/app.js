@@ -352,6 +352,73 @@ function renderFavorites() {
   });
 }
 
+// ── Export / Import favorites ─────────────────────────────────────────────
+const btnExport     = document.getElementById('btn-export');
+const inputImport   = document.getElementById('input-import');
+const elImportFb    = document.getElementById('import-feedback');
+
+btnExport.addEventListener('click', () => {
+  const favs = getFavorites();
+  if (!favs.length) return showImportFeedback('Nenhum favorito para exportar.', 'error');
+
+  const json = JSON.stringify({ version: 1, favorites: favs }, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url,
+    download: `stoic-favorites-${new Date().toISOString().slice(0, 10)}.json`,
+  });
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+inputImport.addEventListener('change', () => {
+  const file = inputImport.files[0];
+  if (!file) return;
+  inputImport.value = '';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const incoming = Array.isArray(parsed) ? parsed
+                     : Array.isArray(parsed?.favorites) ? parsed.favorites
+                     : null;
+
+      if (!incoming) throw new Error('Formato inválido');
+
+      const valid = incoming.filter(f => f?.id && f?.text && f?.author && f?.work);
+      if (!valid.length) throw new Error('Nenhuma frase válida encontrada');
+
+      const existing = getFavorites();
+      const existingIds = new Set(existing.map(f => f.id));
+      const merged  = [...existing, ...valid.filter(f => !existingIds.has(f.id))];
+      const added   = merged.length - existing.length;
+
+      saveFavorites(merged);
+      renderFavorites();
+      updateFavCount();
+      showImportFeedback(
+        added > 0
+          ? `${added} frase${added !== 1 ? 's' : ''} importada${added !== 1 ? 's' : ''} com sucesso.`
+          : 'Todas as frases já estavam nos seus favoritos.',
+        'success'
+      );
+    } catch (err) {
+      showImportFeedback(`Erro ao importar: ${err.message}.`, 'error');
+    }
+  };
+  reader.readAsText(file);
+});
+
+function showImportFeedback(msg, type) {
+  elImportFb.textContent = msg;
+  elImportFb.className   = `import-feedback ${type}`;
+  elImportFb.classList.remove('hidden');
+  clearTimeout(elImportFb._timer);
+  elImportFb._timer = setTimeout(() => elImportFb.classList.add('hidden'), 4000);
+}
+
 // ── Event: Nav tabs ───────────────────────────────────────────────────────
 btnToday.addEventListener('click', () => {
   secToday.classList.remove('hidden');

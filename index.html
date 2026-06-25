@@ -89,7 +89,19 @@
 
     <!-- Seção: Favoritos -->
     <section class="section-favorites hidden" id="section-favorites" aria-label="Frases favoritas">
-      <h2 class="section-title">Seus Favoritos</h2>
+      <div class="fav-header">
+        <h2 class="section-title">Seus Favoritos</h2>
+        <div class="fav-io-btns">
+          <button class="io-btn" id="btn-export" title="Exportar favoritos como JSON">
+            ↓ Exportar
+          </button>
+          <label class="io-btn" id="label-import" title="Importar favoritos de um arquivo JSON">
+            ↑ Importar
+            <input type="file" id="input-import" accept=".json" aria-label="Importar favoritos" />
+          </label>
+        </div>
+      </div>
+      <p class="import-feedback hidden" id="import-feedback" role="status" aria-live="assertive"></p>
       <p class="empty-state hidden" id="empty-favorites">Você ainda não favoritou nenhuma frase.</p>
       <ul class="favorites-list" id="favorites-list" aria-label="Lista de favoritos"></ul>
     </section>
