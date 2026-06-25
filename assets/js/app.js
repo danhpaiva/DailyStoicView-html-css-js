@@ -130,7 +130,7 @@ function saveFavorites(favs) {
 
 function formatDate(date) {
   return date.toLocaleDateString('pt-BR', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    day: 'numeric', month: 'long', year: 'numeric',
   });
 }
 
@@ -477,11 +477,6 @@ document.getElementById('btn-theme').addEventListener('click', () => {
   localStorage.setItem(THEME_KEY, next);
   applyTheme(next);
 });
-
-// ── Service Worker ────────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
-}
 
 // ── Init ─────────────────────────────────────────────────────────────────
 renderQuote(currentDate);
