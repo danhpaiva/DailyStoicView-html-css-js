@@ -583,6 +583,84 @@ body {
 .share-feedback:not(:empty) { opacity: 1; }
 
 /* ===========================
+   Focus / Reading Mode
+   =========================== */
+body.focus-mode .site-header,
+body.focus-mode .site-footer,
+body.focus-mode .date-nav,
+body.focus-mode .streak-wrap,
+body.focus-mode .back-to-today-wrap,
+body.focus-mode .card-actions {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-slow);
+}
+
+body.focus-mode {
+  background-color: #0a0908;
+  background-image: none;
+}
+
+body.focus-mode .main-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: var(--sp-8) var(--sp-6);
+}
+
+body.focus-mode .quote-card {
+  max-width: 640px;
+  width: 100%;
+  padding: var(--sp-10) var(--sp-10);
+  border-color: rgba(255,255,255,.06);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 32px 80px rgba(0,0,0,.6),
+    0 0 120px rgba(202,138,4,.06);
+  background: #161411;
+}
+
+body.focus-mode .quote-text  { color: #f5ede0; font-size: clamp(1.25rem, 2.5vw, 1.65rem); }
+body.focus-mode .quote-author { color: var(--clr-gold); }
+body.focus-mode .quote-work   { color: rgba(245,237,224,.45); }
+body.focus-mode .quote-card::after { color: rgba(202,138,4,.07); }
+body.focus-mode .divider::before,
+body.focus-mode .divider::after { background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent); }
+body.focus-mode .divider-diamond { background: var(--clr-gold); opacity: .4; }
+
+/* Exit button — floats bottom-right in focus mode */
+.focus-exit {
+  position: fixed;
+  bottom: var(--sp-6);
+  right: var(--sp-6);
+  z-index: 200;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.45);
+  font-family: var(--font-sans);
+  font-size: .75rem;
+  font-weight: 500;
+  letter-spacing: .06em;
+  padding: .45rem 1rem;
+  border-radius: var(--r-xl);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  gap: .4rem;
+  backdrop-filter: blur(8px);
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.focus-exit:hover {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.25);
+  color: rgba(255,255,255,.8);
+}
+
+body.focus-mode .focus-exit { display: inline-flex; }
+
+/* ===========================
    Section: Favorites
    =========================== */
 .section-title {

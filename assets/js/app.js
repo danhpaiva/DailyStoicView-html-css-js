@@ -104,6 +104,8 @@ const elQuoteCard    = document.getElementById('quote-card');
 
 const btnFavorite    = document.getElementById('btn-favorite');
 const btnShare       = document.getElementById('btn-share');
+const btnFocus       = document.getElementById('btn-focus');
+const btnFocusExit   = document.getElementById('btn-focus-exit');
 const btnRandom      = document.getElementById('btn-random');
 const elFeedback     = document.getElementById('share-feedback');
 
@@ -225,6 +227,28 @@ document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'ArrowLeft')  shiftDay(-1);
   if (e.key === 'ArrowRight') shiftDay(+1);
+});
+
+// ── Focus Mode ────────────────────────────────────────────────────────────
+function enterFocus() {
+  document.body.classList.add('focus-mode');
+  btnFocus.querySelector('.btn-label').textContent = 'Foco';
+  btnFocusExit.focus();
+}
+
+function exitFocus() {
+  document.body.classList.remove('focus-mode');
+  btnFocus.focus();
+}
+
+btnFocus.addEventListener('click', enterFocus);
+btnFocusExit.addEventListener('click', exitFocus);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.body.classList.contains('focus-mode')) exitFocus();
+  if (e.key === 'f' && !e.ctrlKey && !e.metaKey && e.target.tagName !== 'INPUT') {
+    document.body.classList.contains('focus-mode') ? exitFocus() : enterFocus();
+  }
 });
 
 // ── Event: Random quote ───────────────────────────────────────────────────
