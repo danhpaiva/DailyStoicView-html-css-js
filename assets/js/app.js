@@ -172,38 +172,58 @@ function updateFavCount() {
 }
 
 // ── Render Quote ─────────────────────────────────────────────────────────
-function renderQuote(date) {
+function applyQuoteContent(date) {
   randomQuote = null;
   const quote = getQuote(date, quotes);
-
-  elDateLabel.textContent = formatDate(date);
-  elDatePicker.value      = toInputValue(date);
-  elQuoteText.textContent = `"${quote.text}"`;
+  elDateLabel.textContent   = formatDate(date);
+  elDatePicker.value        = toInputValue(date);
+  elQuoteText.textContent   = `"${quote.text}"`;
   elQuoteAuthor.textContent = quote.author;
   elQuoteWork.textContent   = quote.work;
-
-  // Restart card animation
-  elQuoteCard.style.animation = 'none';
-  elQuoteCard.offsetHeight;
-  elQuoteCard.style.animation = '';
-
-  // Show/hide "back to today"
   btnBackToday.classList.toggle('visible', !isToday(date));
-
   updateFavoriteButton(quote);
 }
 
+function renderQuote(date) {
+  applyQuoteContent(date);
+  // Initial load — simple fade-up, no fold
+  elQuoteCard.classList.remove('folding-out', 'folding-in');
+  elQuoteCard.style.animation = 'none';
+  elQuoteCard.offsetHeight;
+  elQuoteCard.style.animation = '';
+}
+
 // ── Navigate to date ──────────────────────────────────────────────────────
-function navigateTo(date) {
-  currentDate = new Date(date);
-  currentDate.setHours(0, 0, 0, 0);
-  renderQuote(currentDate);
+function navigateTo(date, direction = 0) {
+  const next = new Date(date);
+  next.setHours(0, 0, 0, 0);
+
+  // direction: +1 = forward (fold left), -1 = backward (fold right), 0 = neutral
+  const foldDir   = direction >= 0 ?  '90deg' : '-90deg';
+  const enterDir  = direction >= 0 ? '-90deg' :  '90deg';
+
+  elQuoteCard.style.setProperty('--fold-dir',   foldDir);
+  elQuoteCard.style.setProperty('--fold-enter', enterDir);
+
+  elQuoteCard.classList.remove('folding-in');
+  elQuoteCard.classList.add('folding-out');
+
+  elQuoteCard.addEventListener('animationend', () => {
+    currentDate = next;
+    applyQuoteContent(next);
+    elQuoteCard.classList.remove('folding-out');
+    elQuoteCard.classList.add('folding-in');
+
+    elQuoteCard.addEventListener('animationend', () => {
+      elQuoteCard.classList.remove('folding-in');
+    }, { once: true });
+  }, { once: true });
 }
 
 function shiftDay(delta) {
   const d = new Date(currentDate);
   d.setDate(d.getDate() + delta);
-  navigateTo(d);
+  navigateTo(d, delta);
 }
 
 // ── Event: Prev / Next day ────────────────────────────────────────────────
@@ -216,11 +236,15 @@ elDateLabel.addEventListener('click', () => elDatePicker.showPicker?.() ?? elDat
 elDatePicker.addEventListener('change', () => {
   if (!elDatePicker.value) return;
   const [y, m, d] = elDatePicker.value.split('-').map(Number);
-  navigateTo(new Date(y, m - 1, d));
+  const picked = new Date(y, m - 1, d);
+  navigateTo(picked, picked > currentDate ? 1 : -1);
 });
 
 // ── Event: Back to today ──────────────────────────────────────────────────
-btnBackToday.addEventListener('click', () => navigateTo(today()));
+btnBackToday.addEventListener('click', () => {
+  const delta = today() > currentDate ? 1 : -1;
+  navigateTo(today(), delta);
+});
 
 // ── Keyboard: arrow keys on date nav area ────────────────────────────────
 document.addEventListener('keydown', e => {
@@ -258,19 +282,26 @@ btnRandom.addEventListener('click', () => {
   do { pick = quotes[Math.floor(Math.random() * quotes.length)]; }
   while (quotes.length > 1 && pick === current);
 
-  randomQuote = pick;
+  elQuoteCard.style.setProperty('--fold-dir',   '90deg');
+  elQuoteCard.style.setProperty('--fold-enter', '-90deg');
+  elQuoteCard.classList.remove('folding-in');
+  elQuoteCard.classList.add('folding-out');
 
-  elDateLabel.textContent   = '✦ Frase aleatória';
-  elQuoteText.textContent   = `"${pick.text}"`;
-  elQuoteAuthor.textContent = pick.author;
-  elQuoteWork.textContent   = pick.work;
+  elQuoteCard.addEventListener('animationend', () => {
+    randomQuote = pick;
+    elDateLabel.textContent   = '✦ Frase aleatória';
+    elQuoteText.textContent   = `"${pick.text}"`;
+    elQuoteAuthor.textContent = pick.author;
+    elQuoteWork.textContent   = pick.work;
+    updateFavoriteButton(pick);
+    btnBackToday.classList.add('visible');
 
-  elQuoteCard.style.animation = 'none';
-  elQuoteCard.offsetHeight;
-  elQuoteCard.style.animation = '';
-
-  updateFavoriteButton(pick);
-  btnBackToday.classList.add('visible');
+    elQuoteCard.classList.remove('folding-out');
+    elQuoteCard.classList.add('folding-in');
+    elQuoteCard.addEventListener('animationend', () => {
+      elQuoteCard.classList.remove('folding-in');
+    }, { once: true });
+  }, { once: true });
 });
 
 // ── Event: Favorite ───────────────────────────────────────────────────────

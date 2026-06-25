@@ -403,6 +403,21 @@ body {
 /* ===========================
    Quote Card
    =========================== */
+.quote-card-viewport {
+  perspective: 1200px;
+  perspective-origin: center center;
+}
+
+@keyframes foldOut {
+  0%   { opacity: 1; transform: rotateY(0deg) translateZ(0); }
+  100% { opacity: 0; transform: rotateY(var(--fold-dir, 90deg)) translateZ(-40px); }
+}
+
+@keyframes foldIn {
+  0%   { opacity: 0; transform: rotateY(var(--fold-enter, -90deg)) translateZ(-40px); }
+  100% { opacity: 1; transform: rotateY(0deg) translateZ(0); }
+}
+
 .quote-card {
   background: var(--clr-surface);
   border: 1px solid var(--clr-border-soft);
@@ -416,6 +431,8 @@ body {
   opacity: 0;
   transform: translateY(14px);
   animation: fadeUp .55s cubic-bezier(.22,1,.36,1) forwards;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
 }
 
 /* Ambient glow top-right */
@@ -445,6 +462,14 @@ body {
 
 @keyframes fadeUp {
   to { opacity: 1; transform: translateY(0); }
+}
+
+.quote-card.folding-out {
+  animation: foldOut 220ms cubic-bezier(.4,0,1,1) forwards;
+}
+
+.quote-card.folding-in {
+  animation: foldIn 280ms cubic-bezier(0,.8,.2,1) forwards;
 }
 
 .quote-text {
