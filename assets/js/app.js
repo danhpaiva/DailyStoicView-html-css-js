@@ -130,7 +130,7 @@ function saveFavorites(favs) {
 
 function formatDate(date) {
   return date.toLocaleDateString('pt-BR', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    day: 'numeric', month: 'long', year: 'numeric',
   });
 }
 
