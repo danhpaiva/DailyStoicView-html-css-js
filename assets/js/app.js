@@ -33,7 +33,8 @@ const today = () => {
   return d;
 };
 
-let currentDate = today();
+let currentDate   = today();
+let randomQuote   = null;   // non-null when showing a random quote
 
 // ── DOM Refs ────────────────────────────────────────────────────────────
 const elDateLabel    = document.getElementById('date-label');
@@ -49,6 +50,7 @@ const elQuoteCard    = document.getElementById('quote-card');
 
 const btnFavorite    = document.getElementById('btn-favorite');
 const btnShare       = document.getElementById('btn-share');
+const btnRandom      = document.getElementById('btn-random');
 const elFeedback     = document.getElementById('share-feedback');
 
 const btnToday       = document.getElementById('btn-today');
@@ -91,13 +93,16 @@ function isToday(date) {
          date.getDate()     === t.getDate();
 }
 
+// Returns whichever quote is currently displayed
+function activeQuote() { return randomQuote ?? getQuote(currentDate, quotes); }
+
 function quoteId(quote) { return quote.text.slice(0, 40); }
 
 function isFavorited(quote) {
   return getFavorites().some(f => f.id === quoteId(quote));
 }
 
-function updateFavoriteButton(quote) {
+function updateFavoriteButton(quote = activeQuote()) {
   const faved = isFavorited(quote);
   btnFavorite.querySelector('.icon').textContent = faved ? '♥' : '♡';
   btnFavorite.querySelector('.btn-label').textContent = faved ? 'Favoritado' : 'Favoritar';
@@ -112,6 +117,7 @@ function updateFavCount() {
 
 // ── Render Quote ─────────────────────────────────────────────────────────
 function renderQuote(date) {
+  randomQuote = null;
   const quote = getQuote(date, quotes);
 
   elDateLabel.textContent = formatDate(date);
@@ -167,9 +173,31 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') shiftDay(+1);
 });
 
+// ── Event: Random quote ───────────────────────────────────────────────────
+btnRandom.addEventListener('click', () => {
+  const current = activeQuote();
+  let pick;
+  do { pick = quotes[Math.floor(Math.random() * quotes.length)]; }
+  while (quotes.length > 1 && pick === current);
+
+  randomQuote = pick;
+
+  elDateLabel.textContent   = '✦ Frase aleatória';
+  elQuoteText.textContent   = `"${pick.text}"`;
+  elQuoteAuthor.textContent = pick.author;
+  elQuoteWork.textContent   = pick.work;
+
+  elQuoteCard.style.animation = 'none';
+  elQuoteCard.offsetHeight;
+  elQuoteCard.style.animation = '';
+
+  updateFavoriteButton(pick);
+  btnBackToday.classList.add('visible');
+});
+
 // ── Event: Favorite ───────────────────────────────────────────────────────
 btnFavorite.addEventListener('click', () => {
-  const quote = getQuote(currentDate, quotes);
+  const quote = activeQuote();
   const id    = quoteId(quote);
   let favs    = getFavorites();
 
@@ -192,12 +220,12 @@ elFavList.addEventListener('click', e => {
   saveFavorites(favs);
   renderFavorites();
   updateFavCount();
-  updateFavoriteButton(getQuote(currentDate, quotes));
+  updateFavoriteButton();
 });
 
 // ── Event: Share ─────────────────────────────────────────────────────────
 btnShare.addEventListener('click', async () => {
-  const quote = getQuote(currentDate, quotes);
+  const quote = activeQuote();
   const text  = `"${quote.text}" — ${quote.author} (${quote.work})`;
 
   if (navigator.share) {
