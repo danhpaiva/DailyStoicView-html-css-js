@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Uma frase estoica diferente para cada dia do ano." />
+  <title>Daily Stoic View</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="site-title">Daily Stoic View</h1>
+      <nav class="header-nav" aria-label="Navegação principal">
+        <button class="nav-btn active" id="btn-today" aria-pressed="true">Hoje</button>
+        <button class="nav-btn" id="btn-favorites" aria-pressed="false">
+          Favoritos <span class="favorites-count" id="fav-count" aria-live="polite"></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Seção: Frase do Dia -->
+    <section class="section-today" id="section-today" aria-label="Frase do dia">
+      <p class="date-label" id="date-label" aria-live="polite"></p>
+
+      <article class="quote-card" id="quote-card" aria-live="polite">
+        <blockquote class="quote-text" id="quote-text"></blockquote>
+        <footer class="quote-meta">
+          <span class="quote-author" id="quote-author"></span>
+          <span class="quote-work" id="quote-work"></span>
+        </footer>
+      </article>
+
+      <div class="card-actions">
+        <button class="action-btn" id="btn-favorite" aria-label="Adicionar aos favoritos" title="Favoritar">
+          <span class="icon" aria-hidden="true">♡</span>
+          <span class="btn-label">Favoritar</span>
+        </button>
+        <button class="action-btn" id="btn-share" aria-label="Compartilhar frase" title="Compartilhar">
+          <span class="icon" aria-hidden="true">↗</span>
+          <span class="btn-label">Compartilhar</span>
+        </button>
+        <button class="action-btn" id="btn-tomorrow" aria-label="Ver frase de amanhã" title="Amanhã">
+          <span class="icon" aria-hidden="true">→</span>
+          <span class="btn-label">Amanhã</span>
+        </button>
+      </div>
+
+      <p class="share-feedback" id="share-feedback" aria-live="assertive" role="status"></p>
+    </section>
+
+    <!-- Seção: Favoritos -->
+    <section class="section-favorites hidden" id="section-favorites" aria-label="Frases favoritas">
+      <h2 class="section-title">Seus Favoritos</h2>
+      <p class="empty-state hidden" id="empty-favorites">Você ainda não favoritou nenhuma frase.</p>
+      <ul class="favorites-list" id="favorites-list" aria-label="Lista de favoritos"></ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Filosofia estoica para cada dia · <a href="https://github.com/danhpaiva/DailyStoicView-html-css-js" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
