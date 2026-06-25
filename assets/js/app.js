@@ -380,6 +380,11 @@ document.getElementById('btn-theme').addEventListener('click', () => {
   applyTheme(next);
 });
 
+// ── Service Worker ────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
 // ── Init ─────────────────────────────────────────────────────────────────
 renderQuote(currentDate);
 updateFavCount();
