@@ -1,0 +1,1 @@
+# DailyStoicView-html-css-js
