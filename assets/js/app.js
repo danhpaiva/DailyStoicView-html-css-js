@@ -478,6 +478,125 @@ document.getElementById('btn-theme').addEventListener('click', () => {
   applyTheme(next);
 });
 
+// ── Oikeiôsis — expanding rings of Stoic concern ─────────────────────────
+// Each ring is born at a random point, expands slowly and dissolves —
+// mirroring the Stoic concept of concentric circles spreading from self
+// outward to family, community, and humanity (Epictetus / Hierocles).
+(function initRings() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'particles-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  document.body.prepend(canvas);
+
+  const ctx = canvas.getContext('2d');
+  let W, H, rings, rafId;
+
+  // How many rings can coexist at once
+  const MAX_RINGS    = 7;
+  // How long (ms) a ring takes to fully expand and fade
+  const RING_LIFE    = 9000;
+  // Minimum gap (ms) before spawning another ring
+  const SPAWN_GAP    = 1800;
+  // Maximum radius a ring can reach (fraction of short screen edge)
+  const MAX_R_RATIO  = 0.38;
+
+  let lastSpawn = -Infinity;
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function accentRGB() {
+    return document.documentElement.getAttribute('data-theme') === 'dark'
+      ? '245,158,11'   // amber gold  (dark)
+      : '180,83,9';    // terracotta  (light)
+  }
+
+  function spawnRing(now) {
+    rings.push({
+      x:       rand(W * 0.15, W * 0.85),
+      y:       rand(H * 0.15, H * 0.85),
+      born:    now,
+      maxR:    rand(Math.min(W, H) * 0.12, Math.min(W, H) * MAX_R_RATIO),
+      // each ring spawns 2–4 concentric children with slight time offsets
+      layers:  Math.floor(rand(2, 5)),
+    });
+    lastSpawn = now;
+  }
+
+  function init() {
+    resize();
+    rings = [];
+    // seed a few rings spread across time so the screen isn't empty at start
+    const now = performance.now();
+    for (let i = 0; i < 3; i++) {
+      rings.push({
+        x:      rand(W * 0.15, W * 0.85),
+        y:      rand(H * 0.15, H * 0.85),
+        born:   now - rand(1000, RING_LIFE * 0.8),
+        maxR:   rand(Math.min(W, H) * 0.12, Math.min(W, H) * MAX_R_RATIO),
+        layers: Math.floor(rand(2, 5)),
+      });
+    }
+  }
+
+  function draw(now) {
+    ctx.clearRect(0, 0, W, H);
+    const rgb = accentRGB();
+
+    // spawn new ring if there's room and enough time has passed
+    if (rings.length < MAX_RINGS && now - lastSpawn > SPAWN_GAP) {
+      spawnRing(now);
+    }
+
+    // draw & age rings
+    rings = rings.filter(ring => {
+      const age = now - ring.born;
+      if (age > RING_LIFE) return false;
+
+      const progress = age / RING_LIFE; // 0 → 1
+
+      for (let l = 0; l < ring.layers; l++) {
+        // stagger each layer: layer 0 leads, others trail behind
+        const layerProgress = Math.max(0, progress - l * 0.12);
+        if (layerProgress <= 0) continue;
+
+        const r     = ring.maxR * layerProgress;
+        // opacity: rises quickly, lingers, fades out in last 40%
+        const alpha = layerProgress < 0.6
+          ? layerProgress / 0.6 * 0.18
+          : (1 - (layerProgress - 0.6) / 0.4) * 0.18;
+
+        if (alpha <= 0) continue;
+
+        ctx.beginPath();
+        ctx.arc(ring.x, ring.y, r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${rgb},${alpha})`;
+        // thicker at birth, thinner as it expands — like a real ripple
+        ctx.lineWidth = Math.max(0.4, 1.8 * (1 - layerProgress));
+        ctx.stroke();
+      }
+
+      return true;
+    });
+
+    rafId = requestAnimationFrame(draw);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { cancelAnimationFrame(rafId); }
+    else { rafId = requestAnimationFrame(draw); }
+  });
+
+  window.addEventListener('resize', resize);
+
+  init();
+  rafId = requestAnimationFrame(draw);
+}());
+
 // ── Init ─────────────────────────────────────────────────────────────────
 renderQuote(currentDate);
 updateFavCount();
